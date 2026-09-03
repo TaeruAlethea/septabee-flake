@@ -30,7 +30,7 @@
     version = "yeet-44";
 
     septabee-pkg = pkgs.stdenv.mkDerivation {
-        name = "septabee-${version}";
+        name = "septabee";
         version = version;
         src = pkgs.fetchurl {
           url = "https://septabee.nekoweb.org/important_stuff/SEPTABEE_DOWNLOADS/version_B/septabee_linux_B_T2.7z";
