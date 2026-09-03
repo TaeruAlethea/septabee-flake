@@ -55,9 +55,9 @@
         installPhase = ''
           runHook preInstall
           
-          mkdir -p "$out/bin" "$out/lib/septabee"
-          cp -r ./linux/* "$out/lib/septabee"
-          ln -s "$out/lib/septabee/septabee" "$out/bin/septabee"
+          mkdir -p "$out/bin" "$out/lib"
+          cp -r ./linux/* "$out/lib"
+          ln -s "$out/lib/septabee" "$out/bin/septabee"
           
           runHook postInstall
         '';
