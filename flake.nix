@@ -71,6 +71,13 @@
     packages.${system} = {
       default = septabee-pkg;
     };
+
+    apps.${system} = {
+      default = {
+        type = "app";
+        program = "${septabee-pkg}/bin/septabee";
+      };
+    };
     
     nixosModules.${system}.default = { ... }: {
       security.wrappers.septabee = {
