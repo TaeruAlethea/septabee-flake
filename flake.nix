@@ -23,6 +23,8 @@
       lilv
       zstd
       ncurses
+      wayland
+      libxkbcommon
     ];
     version = "yeet-44";
 
