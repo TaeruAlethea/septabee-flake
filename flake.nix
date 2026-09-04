@@ -88,7 +88,7 @@
     nixosModules.${system}.default = { config, lib, ... }: {
       options.programs.septabee = with lib;  {
     		enable = mkEnableOption "septabee";
-    		package = mkPackageOption septabee-pkg "septabee";
+    		package = septabee-pkg;
     		wayland = mkOption {
      			type = types.bool;
      			default = !config.services.xserver.enable;
