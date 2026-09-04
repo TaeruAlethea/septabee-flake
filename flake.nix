@@ -1,5 +1,5 @@
 {
-  description = "A very basic flake";
+  description = "A very basic flake to run Septabee";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
@@ -13,6 +13,12 @@
   let
     system = "x86_64-linux";
     pkgs = import nixpkgs { inherit system; };
+    meta = {
+      description = "A bespoke DAW filled with fruits and where Z stands for Pomegranate";
+      platform = [ "${system}" ]; 
+      mainProgram = "septabee";
+    };
+
     depends = with pkgs; [
       libpng
       vulkan-loader
@@ -22,7 +28,12 @@
       stdenv.cc.cc.lib
       lilv
       zstd
-      ncurses
+      ncurses 
+    ];
+    waylandDepends = with pkgs; [
+      wayland
+      # kdePackages.wayland ## Not sure if this is a hard requirement. cannot test myself
+      libxkbcommon
     ];
     version = "yeet-44";
 
@@ -34,10 +45,11 @@
           sha256 = "sha256-OMnbRBTku8yi4b3Ay7d70EbB/e2Qh+PfzK2O8qRFoaA=";
         };
 
+        runtimeDependencies = waylandDepends; 
+
         nativeBuildInputs = with pkgs; [
           p7zip
           autoPatchelfHook
-          makeWrapper
         ];
 
         buildInputs = depends;
@@ -55,27 +67,30 @@
           runHook postInstall
         '';
 
-        postFixup = ''
-          wrapProgram "$out/bin/septabee" \
-            --chdir "$out" \
-            --run "
-              data_home=\"\''\${XDG_DATA_HOME:-\$HOME/.local/share}\"
-              abi_dir=\"\$data_home/Septabee/llvm-stuffs/abi-8\"
-
-              mkdir -p \"\$abi_dir\"
-            "
-        '';
+        meta = meta;
     };
+
+    septabeeXNoWayland = (septabee-pkg).overrideAttrs {
+        runtimeDependencies = [];
+      };
   in
   {
     packages.${system} = {
       default = septabee-pkg;
+      xNoWayland = septabeeXNoWayland;
     };
 
     apps.${system} = {
       default = {
         type = "app";
         program = "${septabee-pkg}/bin/septabee";
+        meta = meta;
+      };
+
+      xNoWayland = {
+        type = "app";
+        program = "${septabeeXNoWayland}/bin/septabee";
+        meta = meta;
       };
     };
     
