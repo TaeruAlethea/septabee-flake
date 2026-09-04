@@ -110,7 +110,7 @@
           group = "root";
           permissions = "u-rwx,g=rx,o=rx";
           capabilities = "cap_sys_nice+ep";
-          source = "${septabee-pkg}/lib/septabee";
+          source = "${p}/lib/septabee";
         };
 
         security.wrappers.septabee-sounds = {
@@ -118,7 +118,7 @@
           group = "root";
           permissions = "u-rwx,g=rx,o=rx";
           capabilities = "cap_sys_nice+ep";
-          source = "${septabee-pkg}/lib/septabee-sounds";
+          source = "${p}/lib/septabee-sounds";
         };
       };
     };
