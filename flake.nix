@@ -15,7 +15,7 @@
     pkgs = import nixpkgs { inherit system; };
     version = "yeet-44";
 
-    septabee-pkg = { pkgs, use-wayland ? true, ... }: pkgs.stdenv.mkDerivation {
+    septabee-pkg = { pkgs, use-wayland ? true, ... }: pkgs.stdenv.mkDerivation rec {
         pname = "septabee";
         version = version;
         src = pkgs.fetchurl {
@@ -28,16 +28,16 @@
           autoPatchelfHook
         ];
 
-        buildInputs = [
+        buildInputs = with pkgs;[
             pipewire
             libx11
             stdenv.cc.cc.lib
           ];
 
-        appendRunpaths = [
+        appendRunpaths = with pkgs;[
           "${lib.makeLibraryPath [
             vulkan-loader
-            pipewire ] ++ pkgs.lib.optionals wayland [
+            pipewire ] ++ pkgs.lib.optionals use-wayland [
             wayland
             libxkbcommon
           ]}"
@@ -73,12 +73,11 @@
         '';
       
         meta.mainProgram = "septabee";
-        desktopItem = makeDesktopItem rec {
+        desktopItem = pkgs.makeDesktopItem rec {
           name = pname;
           exec = name;
           desktopName = "Septabee DAW";
           genericName = "Septabee Digital Audio Workstation";
-          comment = meta.description;
           categories = [
             "Audio"
           ];
@@ -97,7 +96,7 @@
       };
     };
     
-    nixosModules.${system}.default = { ... }: {
+    nixosModules.${system}.default = { config, lib, ... }: {
       options.programs.septabee = with lib;  {
     		enable = mkEnableOption "septabee";
     		package = mkPackageOption septabee-pkg;
@@ -111,7 +110,7 @@
 
       config = let
         c = config.programs.septabee;
-        p = c.package.override { use-wayland = c.wayland };
+        p = c.package.override { use-wayland = c.wayland; };
       in lib.mkIf c.enable {
       	environment.systemPackages = [
      			p
