@@ -13,22 +13,9 @@
   let
     system = "x86_64-linux";
     pkgs = import nixpkgs { inherit system; };
-    depends = with pkgs; [
-      libpng
-      vulkan-loader
-      freetype
-      pipewire
-      libx11
-      stdenv.cc.cc.lib
-      lilv
-      zstd
-      ncurses
-      wayland
-      libxkbcommon
-    ];
     version = "yeet-44";
 
-    septabee-pkg = pkgs.stdenv.mkDerivation {
+    septabee-pkg = { pkgs, use-wayland ? true, ... }: pkgs.stdenv.mkDerivation {
         pname = "septabee";
         version = version;
         src = pkgs.fetchurl {
@@ -39,10 +26,22 @@
         nativeBuildInputs = with pkgs; [
           p7zip
           autoPatchelfHook
-          makeWrapper
         ];
 
-        buildInputs = depends;
+        buildInputs = [
+            pipewire
+            libx11
+            stdenv.cc.cc.lib
+          ];
+
+        appendRunpaths = [
+          "${lib.makeLibraryPath [
+            vulkan-loader
+            pipewire ] ++ pkgs.lib.optionals wayland [
+            wayland
+            libxkbcommon
+          ]}"
+        ];
 
         unpackPhase = ''
           runHook preUnpack
@@ -64,7 +63,6 @@
 
         postFixup = ''
           wrapProgram "$out/bin/septabee" \
-            --prefix LD_LIBRARY_PATH : "${nixpkgs.lib.makeLibraryPath depends}" \
             --chdir "$out" \
             --run "
               data_home=\"\''\${XDG_DATA_HOME:-\$HOME/.local/share}\"
@@ -75,6 +73,16 @@
         '';
       
         meta.mainProgram = "septabee";
+        desktopItem = makeDesktopItem rec {
+          name = pname;
+          exec = name;
+          desktopName = "Septabee DAW";
+          genericName = "Septabee Digital Audio Workstation";
+          comment = meta.description;
+          categories = [
+            "Audio"
+          ];
+        };
     };
   in
   {
@@ -90,20 +98,40 @@
     };
     
     nixosModules.${system}.default = { ... }: {
-      security.wrappers.septabee = {
-        owner = "root";
-        group = "root";
-        permissions = "u-rwx,g=rx,o=rx";
-        capabilities = "cap_sys_nice+ep";
-        source = "${septabee-pkg}/lib/septabee";
-      };
+      options.programs.septabee = with lib;  {
+    		enable = mkEnableOption "septabee";
+    		package = mkPackageOption septabee-pkg;
+    		wayland = mkOption {
+     			type = types.bool;
+     			default = !config.services.xserver.enable;
+     			example = false;
+     			description = "Toggle Wayland-specific buildInputs.";
+    		};
+     	};
 
-      security.wrappers.septabee-sounds = {
-        owner = "root";
-        group = "root";
-        permissions = "u-rwx,g=rx,o=rx";
-        capabilities = "cap_sys_nice+ep";
-        source = "${septabee-pkg}/lib/septabee-sounds";
+      config = let
+        c = config.programs.septabee;
+        p = c.package.override { use-wayland = c.wayland };
+      in lib.mkIf c.enable {
+      	environment.systemPackages = [
+     			p
+    		];
+        
+        security.wrappers.septabee = {
+          owner = "root";
+          group = "root";
+          permissions = "u-rwx,g=rx,o=rx";
+          capabilities = "cap_sys_nice+ep";
+          source = "${septabee-pkg}/lib/septabee";
+        };
+
+        security.wrappers.septabee-sounds = {
+          owner = "root";
+          group = "root";
+          permissions = "u-rwx,g=rx,o=rx";
+          capabilities = "cap_sys_nice+ep";
+          source = "${septabee-pkg}/lib/septabee-sounds";
+        };
       };
     };
   };
