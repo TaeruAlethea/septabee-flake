@@ -70,7 +70,7 @@
         meta = meta;
     };
 
-    septabeeXNoWayland = (septabee-pkg).overrideAttrs {
+    septabeeXNoWayland = septabee-pkg.overrideAttrs {
         runtimeDependencies = [];
       };
   in
