@@ -95,7 +95,7 @@
         {
           options.programs.septabee = with lib; {
             enable = mkEnableOption "septabee";
-            package = flake.perSystem.packages.default;
+            package = mkPackageOption pkgs "septabee";
             wayland = mkOption {
               type = types.bool;
               default = !config.services.xserver.enable;
