@@ -95,7 +95,7 @@
         {
           options.programs.septabee = with lib; {
             enable = mkEnableOption "septabee";
-            package = septabee-pkg;
+            package = flake.perSystem.packages.default;
             wayland = mkOption {
               type = types.bool;
               default = !config.services.xserver.enable;
@@ -108,7 +108,6 @@
             let
               c = config.programs.septabee;
               p = c.package.override {
-
                 appendRunpaths = with pkgs; [
                   "${
                     lib.makeLibraryPath [
