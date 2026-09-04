@@ -67,6 +67,18 @@
           runHook postInstall
         '';
 
+        desktopItem = pkgs.makeDesktopItem {
+          name = "Septabee";
+          exec = "septabee";
+          categories = [
+              "Audio"
+              "Music"
+              "Midi"
+          ];
+          desktopName = "Septabee DAW";
+          genericName = "Septabee Digital Audio Workstation";
+        };
+
         meta = meta;
     };
 
