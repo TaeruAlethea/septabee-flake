@@ -60,17 +60,6 @@
           
           runHook postInstall
         '';
-
-        postFixup = ''
-          wrapProgram "$out/bin/septabee" \
-            --chdir "$out" \
-            --run "
-              data_home=\"\''\${XDG_DATA_HOME:-\$HOME/.local/share}\"
-              abi_dir=\"\$data_home/Septabee/llvm-stuffs/abi-8\"
-
-              mkdir -p \"\$abi_dir\"
-            "
-        '';
       
         meta.mainProgram = "septabee";
         desktopItem = pkgs.makeDesktopItem rec {
