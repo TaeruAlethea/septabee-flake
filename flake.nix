@@ -5,17 +5,17 @@
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
   };
 
-  outputs = { 
-    self, 
+  outputs = {
+    self,
     nixpkgs,
-    ... 
-  }: 
+    ...
+  }:
   let
     system = "x86_64-linux";
     pkgs = import nixpkgs { inherit system; };
     meta = {
       description = "A bespoke DAW filled with fruits and where Z stands for Pomegranate";
-      platform = [ "${system}" ]; 
+      platform = [ "${system}" ];
       mainProgram = "septabee";
     };
 
@@ -28,7 +28,7 @@
       stdenv.cc.cc.lib
       lilv
       zstd
-      ncurses 
+      ncurses
     ];
     waylandDepends = with pkgs; [
       wayland
@@ -49,8 +49,8 @@
           url = "https://septabee.nekoweb.org/important_stuff/SEPTABEE_DOWNLOADS/version_B/septabee_linux_B_T2.7z";
           sha256 = "sha256-OMnbRBTku8yi4b3Ay7d70EbB/e2Qh+PfzK2O8qRFoaA=";
         };
-        
-        runtimeDependencies = waylandDepends; 
+
+        runtimeDependencies = waylandDepends;
 
         nativeBuildInputs = with pkgs; [
           p7zip
@@ -67,7 +67,7 @@
 
         installPhase = ''
           runHook preInstall
-          mkdir -p "$out/bin" 
+          mkdir -p "$out/bin"
           cp -r ./linux/* "$out/bin/"
           cp -r "$desktopItems/share" "$out"
           runHook postInstall
@@ -87,7 +87,7 @@
             desktopName = "Septabee DAW";
             genericName = "Septabee Digital Audio Workstation";
           })
-        ]; 
+        ];
 
         meta = meta;
     };
@@ -115,7 +115,7 @@
         meta = meta;
       };
     };
-    
+
     nixosModules.${system}.default = { ... }: {
       security.wrappers.septabee = {
         owner = "root";
