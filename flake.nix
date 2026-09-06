@@ -30,22 +30,30 @@
       zstd
       ncurses 
     ];
+
     waylandDepends = with pkgs; [
       wayland
       # kdePackages.wayland ## Not sure if this is a hard requirement. cannot test myself
       libxkbcommon
     ];
-    version = "yeet-44";
+
+    runtimeDependencies = with pkgs; [
+      pipewire
+      vulkan-loader
+    ];
+
+
+    version = "B_T3";
 
     septabee-pkg = pkgs.stdenv.mkDerivation {
         name = "septabee-${version}";
         version = version;
         src = pkgs.fetchurl {
-          url = "https://septabee.nekoweb.org/important_stuff/SEPTABEE_DOWNLOADS/version_B/septabee_linux_B_T2.7z";
-          sha256 = "sha256-OMnbRBTku8yi4b3Ay7d70EbB/e2Qh+PfzK2O8qRFoaA=";
+          url = "https://septabee.nekoweb.org/important_stuff/SEPTABEE_DOWNLOADS/version_B/septabee_linux_B_T3.7z";
+          sha256 = "sha256-vdXJ4Qusvi/ehztmp2iibiFZLJvbU7+mRnR7KSmxrFA=";
         };
 
-        runtimeDependencies = waylandDepends; 
+        runtimeDependencies = waylandDepends ++ runtimeDependencies; 
 
         nativeBuildInputs = with pkgs; [
           p7zip
@@ -86,8 +94,8 @@
     };
 
     septabeeXNoWayland = septabee-pkg.overrideAttrs {
-        runtimeDependencies = [];
-      };
+      runtimeDependencies = runtimeDependencies;
+    };
   in
   {
     packages.${system} = {
