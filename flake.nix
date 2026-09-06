@@ -37,6 +37,11 @@
     ];
     version = "yeet-44";
 
+    icon = pkgs.fetchurl {
+      url = "https://septabee.nekoweb.org/important_stuff/septabee.png";
+      sha256 = "sha256-eOi7RpU4niZoFjg3bw1NOYj9U96YxOr2TGj8d37D5FY=";
+    };
+
     septabee-pkg = pkgs.stdenv.mkDerivation {
         name = "septabee-${version}";
         version = version;
@@ -44,7 +49,7 @@
           url = "https://septabee.nekoweb.org/important_stuff/SEPTABEE_DOWNLOADS/version_B/septabee_linux_B_T2.7z";
           sha256 = "sha256-OMnbRBTku8yi4b3Ay7d70EbB/e2Qh+PfzK2O8qRFoaA=";
         };
-
+        
         runtimeDependencies = waylandDepends; 
 
         nativeBuildInputs = with pkgs; [
@@ -72,7 +77,9 @@
           (pkgs.makeDesktopItem {
             name = "Septabee";
             exec = "septabee";
+            icon = icon;
             categories = [
+                "AudioVideo"
                 "Audio"
                 "Music"
                 "Midi"
